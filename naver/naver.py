@@ -173,7 +173,7 @@ class Naver:
           check_url = self.format_place_url(link)
         else:
           check_url = self.deleteHttp(link)
-
+        
         if check_url == self.__url:
           isBreak = True
           post_rank = (x * 10 + idx)

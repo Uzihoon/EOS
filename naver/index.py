@@ -23,8 +23,8 @@ import naver
 ##
 
 ## get db info
-search_key = "blog"
-db_url = "https://blog.naver.com/digitaldiir/221469517946"
+search_key = "video"
+db_url = "https://www.youtube.com/watch?v=1tt4lnECtHI"
 sort_type = "rel.dsc"
 key = "쯔위"
 
