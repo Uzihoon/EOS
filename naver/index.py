@@ -6,10 +6,7 @@ from bs4 import BeautifulSoup
 import naver_post
 import naver
 
-## db로부터 받아오는 data
-key = '강남'
-
-## search_key
+## target type
 # 블로그 = blog
 # 카페 = cafe
 # 지식in = kin
@@ -19,17 +16,43 @@ key = '강남'
 # 플레이스 = place
 # 포스트 = post
 ##
-search_key = "place"
 
-## search url
-db_url = "https://store.naver.com/restaurants/detail?id=12783829"
+## target sort_type
+# rel.dsc = 관련도순
+# createDate.dsc = 최신순
+##
 
-## chrome driver
-driver = webdriver.Chrome("./chromedriver")
-driver.implicitly_wait(3)
+## get db info
+search_key = "blog"
+db_url = "https://blog.naver.com/digitaldiir/221469517946"
+sort_type = "rel.dsc"
+key = "쯔위"
+
+class SearchInfo:
+
+  def __init__(self, url, key, search, sort):
+    ## target url
+    self.url = url
+    ## target key
+    self.key = key
+    ## target type
+    self.search = search
+    ## target sort type
+    self.sort = sort
+
+## db info
+info = SearchInfo(db_url, key, search_key, sort_type)
 
 ## post rank
-post_rank = None
+naver_data = None
+rank = None
 
 ## post 일 경우 따로 실행해 준다.
-if search_key == "post":
+if info.search == "post":
+  naver_data = naver_post.NaverPost(info.key, info.url, info.sort)
+else:
+  naver_data = naver.Naver(info.key, info.url, info.search)
+
+rank = naver_data.rank()
+
+print(rank)
