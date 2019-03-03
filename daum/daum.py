@@ -3,6 +3,7 @@ import re
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import common
+import urllib.request
 
 class Daum:
 
@@ -12,13 +13,14 @@ class Daum:
     self.__basic_reg = re.compile('^[^?]+')
     self.__log_reg = re.compile('(?<=logNo=)\w+')
     self.__blog_id_reg = re.compile('(?<=blogId=)\w+')
+    self.__news_id_reg = re.compile("\d+")
 
     self.__key = key
     self.__search_type = search
     self.__where = self.search_type(self.__search_type)
-    self.__url = common.deleteHttp(url)
+    self.__url = self.format_id_url(url) if (self.__search_type == "news" or self.__search_type == "tip") else common.deleteHttp(url)
 
-    self.__driver_url = "https://search.daum.net/search?q={0}&w={1}".format(self.__key, self.__search_type)
+    self.__driver_url = "https://search.daum.net/search?q={0}&w={1}".format(self.__key, self.__where)
 
     ## chrome driver
     self.driver = webdriver.Chrome("./chromedriver")
@@ -32,7 +34,8 @@ class Daum:
       "blog": "blog",
       "site": "site",
       "video": "vclip",
-      "news": "news"
+      "news": "news",
+      "tip": "knowledge"
     }.get(search_type, 'post')
 
   ## make start str
@@ -52,7 +55,8 @@ class Daum:
   ## make a link class
   def make_a_link_class(self, key):
       return {
-          "news": "f_nb"
+          "news": "f_nb",
+          "tip": "f_link_b"
       }.get(key, 'f_url')
 
    ## make ul select
@@ -60,14 +64,16 @@ class Daum:
       return {
           "blog": ".list_info",
           "video": "#vclipList",
-          "news": "#clusterResultUL"
+          "news": "#clusterResultUL",
+          "tip": "#knowResultUL"
       }.get(key, '.list_info')
 
   ## make list container
   def make_list_container(self, key):
       return {
           "blog": ".coll_cont",
-          "news": ".coll_cont"
+          "news": ".coll_cont",
+          "tip": "#knowResultWrapper"
       }.get(key, '.mg_cont')
   
   ## make li select
@@ -84,6 +90,11 @@ class Daum:
       log_no = self.__log_reg.search(check_url).group()
       blog_id = self.__blog_id_reg.search(check_url).group()
       check_url = "{0}/{1}/{2}".format(reg_url.group(), blog_id, log_no)
+    return check_url
+
+  ## news url format
+  def format_id_url(self, url):
+    check_url = self.__news_id_reg.search(common.deleteHttp(url)).group()
     return check_url
 
   def find_target_post(self):
@@ -115,12 +126,13 @@ class Daum:
       for idx, val in enumerate(li_list, 1):
         a_tag = val.find('a', class_= a_link_class)
         link = str()
-
         if a_tag is not None:
           link = a_tag.get('href')
           check_url = str()
           if self.__search_type == 'blog':
             check_url = self.format_blog_url(link)
+          elif self.__search_type == "news" or self.__search_type == "tip":
+            check_url = self.format_id_url(link)
           else:
             check_url = common.deleteHttp(link)
 

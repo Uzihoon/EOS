@@ -8,8 +8,9 @@ import daum
 ## target type
 # 블로그 = blog
 # 사이트 = site
-# 동영상 = video
+# 동영상 = video (작업 전)
 # 뉴스 = news
+# 팁 = tip (작업 전)
 ##
 
 ## target sort_type
@@ -17,11 +18,12 @@ import daum
 
 ## URI Type
 # youtube: https://youtu.be/qeedIyEjjmQ
+# news: daum news url type (daum news 외 url(ex: 외부 사이트)의 경우 확인 불가)
 ##
 
 ## get db info
-search_type = "news"
-db_url = "https://blog.naver.com/parkchan1029"
+search_type = "tip"
+db_url = "https://tip.daum.net/question/86428255"
 sort_type = "null"
 key = "쯔위"
 keyword = "TWICE 트와이스 쯔위 굿즈- 15장 포토스탠드"
