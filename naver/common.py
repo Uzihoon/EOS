@@ -1,10 +1,8 @@
-## common.py
 import re
 
+http_reg = re.compile("^https?://+")
+
 ## delete HTTP protocol
-regObj = re.compile('^https?://+')
-
 def deleteHttp(target):
-  url = re.sub(regObj, '', target)
-  return url
-
+    url = re.sub(http_reg, '', target)
+    return url

@@ -2,12 +2,12 @@ import time
 import re
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import common
 
 class Naver:
 
   def __init__(self, key, url, search):
     ## regexp
-    self.__http_reg = re.compile("^https?://+")
     self.__blog_target_reg = re.compile('blog.naver.com')
     self.__palce_target_reg = re.compile('store.naver.com/restaurants/detail')
     self.__log_reg = re.compile('(?<=logNo=)\w+')
@@ -19,7 +19,7 @@ class Naver:
     self.__key = key
     self.__search_key = search
     self.__where = self.search_type(self.__search_key)
-    self.__url = self.format_kin_url(url) if self.__search_key == "kin" else self.deleteHttp(url)
+    self.__url = self.format_kin_url(url) if self.__search_key == "kin" else common.deleteHttp(url)
 
     ## naver place 외 default url 적용
     self.__default_url = "https://search.naver.com/search.naver?where={0}&query={1}".format(self.__where, self.__key)
@@ -43,24 +43,23 @@ class Naver:
       'video': 'video'
     }.get(search_type, 'post')
 
-  ## delete HTTP protocol
-  def deleteHttp(self, target):
-    url = re.sub(self.__http_reg, '', target)
-    return url
-
   ## 지식in url format
   def format_kin_url(self, url):
-    check_url = self.deleteHttp(url)
-    reg_url = self.__basic_reg.search(check_url).group()
-    if reg_url is not None:
-      dirId = self.__dir_reg.search(check_url).group()
-      docId = self.__doc_reg.search(check_url).group()
-      check_url = "{0}?dirId={1}&docId={2}".format(reg_url, dirId, docId)
-    return check_url
+    try:
+      check_url = common.deleteHttp(url)
+      reg_url = self.__basic_reg.search(check_url).group()
+      if reg_url is not None:
+        dirId = self.__dir_reg.search(check_url).group()
+        docId = self.__doc_reg.search(check_url).group()
+        check_url = "{0}?dirId={1}&docId={2}".format(reg_url, dirId, docId)
+    except AttributeError:
+      return -1
+    else:
+      return check_url
 
   ## place url format
   def format_place_url(self, url):
-    check_url = self.deleteHttp(url)
+    check_url = common.deleteHttp(url)
     basic_url = self.__basic_reg.search(check_url).group()
     url_id = self.__id_reg.search(check_url).group()
     check_url = "{0}?id={1}".format(basic_url, url_id)
@@ -68,7 +67,7 @@ class Naver:
 
   ## blog url format
   def format_blog_url(self, url):
-    check_url = self.deleteHttp(url)
+    check_url = common.deleteHttp(url)
     reg_url = self.__blog_target_reg.search(check_url)
     if reg_url is not None:
       log_no = self.__log_reg.search(check_url).group()
@@ -125,17 +124,20 @@ class Naver:
 
   ## get post rank
   def rank(self):
-    ## chrome driver
-    self.driver.get(self.__driver_url)
-    time.sleep(1)
-    self.__post_rank = self.find_target_post()
-    return self.__post_rank
+    if self.__url == -1:
+      return -1
+    else:
+      ## chrome driver
+      self.driver.get(self.__driver_url)
+      time.sleep(1)
+      self.__post_rank = self.find_target_post()
+      return self.__post_rank
 
   def find_target_post(self):
     post_rank = None
     ## url
     current = self.driver.current_url
-    ## page parameter url
+    ## page parameter url 
     start_str = self.make_start_str(self.__search_key)
     ## element selector
     a_link_class = self.make_a_link_class(self.__search_key)
@@ -172,7 +174,7 @@ class Naver:
         elif self.__search_key == 'place':
           check_url = self.format_place_url(link)
         else:
-          check_url = self.deleteHttp(link)
+          check_url = common.deleteHttp(link)
         
         if check_url == self.__url:
           isBreak = True
