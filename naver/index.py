@@ -29,6 +29,10 @@ import naver_shop
 # review = 리뷰 많은 순
 ##
 
+## URI Type
+# https://kin.naver.com/qna/detail.nhn?dirId=811&docId=315382080
+##
+
 ## get db info
 search_key = "kin"
 db_url = "https://blog.naver.com/ideamode/221327332564"

@@ -17,14 +17,14 @@ class Naver:
     self.__id_reg = re.compile("(?<=id=)\w+")
     
     self.__key = key
-    self.__search_key = search
-    self.__where = self.search_type(self.__search_key)
-    self.__url = self.format_kin_url(url) if self.__search_key == "kin" else common.deleteHttp(url)
+    self.__search_type = search
+    self.__where = self.search_type(self.__search_type)
+    self.__url = self.format_kin_url(url) if self.__search_type == "kin" else common.deleteHttp(url)
 
     ## naver place 외 default url 적용
     self.__default_url = "https://search.naver.com/search.naver?where={0}&query={1}".format(self.__where, self.__key)
     self.__place_url = "https://store.naver.com/restaurants/list?query={0}".format(self.__key)
-    self.__driver_url = self.__place_url if self.__search_key == "place" else self.__default_url
+    self.__driver_url = self.__place_url if self.__search_type == "place" else self.__default_url
 
     ## chrome driver
     self.driver = webdriver.Chrome("./chromedriver")
@@ -100,7 +100,7 @@ class Naver:
           'news': '_sp_each_title',
           'video': 'title',
           "place": "name"
-      }.get(key, 'sh_{0}_title'.format(self.__search_key))
+      }.get(key, 'sh_{0}_title'.format(self.__search_type))
   
   ## make ul select
   def make_ul_select(self, key):
@@ -138,16 +138,16 @@ class Naver:
     ## url
     current = self.driver.current_url
     ## page parameter url 
-    start_str = self.make_start_str(self.__search_key)
+    start_str = self.make_start_str(self.__search_type)
     ## element selector
-    a_link_class = self.make_a_link_class(self.__search_key)
-    list_container = self.make_list_container(self.__search_key)
-    list_item = "{0} > {1}".format(self.make_ul_select(self.__search_key), self.make_li_select(self.__search_key))
+    a_link_class = self.make_a_link_class(self.__search_type)
+    list_container = self.make_list_container(self.__search_type)
+    list_item = "{0} > {1}".format(self.make_ul_select(self.__search_type), self.make_li_select(self.__search_type))
 
     ## naver 탐색
     for x in range(0, 10):
 
-      pages = (x + 1) if self.__search_key == 'place' else (x * 10) + 1
+      pages = (x + 1) if self.__search_type == 'place' else (x * 10) + 1
       current_page = start_str + repr(pages)
       self.driver.get(current + current_page)
 
@@ -167,11 +167,11 @@ class Naver:
           link = a_tag.get('href')
 
         check_url = str()
-        if self.__search_key == 'blog':
+        if self.__search_type == 'blog':
           check_url = self.format_blog_url(link)
-        elif self.__search_key == 'kin':
+        elif self.__search_type == 'kin':
           check_url = self.format_kin_url(link)
-        elif self.__search_key == 'place':
+        elif self.__search_type == 'place':
           check_url = self.format_place_url(link)
         else:
           check_url = common.deleteHttp(link)
