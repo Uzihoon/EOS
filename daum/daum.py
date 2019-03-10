@@ -7,7 +7,7 @@ import urllib.request
 
 class Daum:
 
-  def __init__(self, key, url, search):
+  def __init__(self, key, url, search, sort):
     ## regexp
     self.__blog_target_reg = re.compile('blog.naver.com')
     self.__basic_reg = re.compile('^[^?]+')
@@ -19,8 +19,11 @@ class Daum:
     self.__search_type = search
     self.__where = self.search_type(self.__search_type)
     self.__url = self.format_id_url(url) if (self.__search_type == "news" or self.__search_type == "tip") else common.deleteHttp(url)
+    self.__sort_type = sort
 
-    self.__driver_url = "https://search.daum.net/search?q={0}&w={1}".format(self.__key, self.__where)
+    self.__default_url = "https://search.daum.net/search?q={0}&w={1}".format(self.__key, self.__where)
+    self.__cafe_url = "http://top.cafe.daum.net/_c21_/search?search_opt=board&q={0}&sort_type={1}".format(self.__key, self.__sort_type)
+    self.__driver_url = self.__cafe_url if self.__search_type == "cafe" else self.__default_url
 
     ## chrome driver
     self.driver = webdriver.Chrome("./chromedriver")
@@ -35,13 +38,15 @@ class Daum:
       "site": "site",
       "video": "vclip",
       "news": "news",
-      "tip": "knowledge"
+      "tip": "knowledge",
+      "cafe": "cafe"
     }.get(search_type, 'post')
 
   ## make start str
   def make_start_str(self, key):
       return {
           "news": "&p=",
+          "cafe": "&p="
       }.get(key, '&page=')
 
   ## get post rank
@@ -56,7 +61,8 @@ class Daum:
   def make_a_link_class(self, key):
       return {
           "news": "f_nb",
-          "tip": "f_link_b"
+          "tip": "f_link_b",
+          "cafe": "link_url"
       }.get(key, 'f_url')
 
    ## make ul select
@@ -65,7 +71,8 @@ class Daum:
           "blog": ".list_info",
           "video": "#vclipList",
           "news": "#clusterResultUL",
-          "tip": "#knowResultUL"
+          "tip": "#knowResultUL",
+          "cafe": ".list_scafe"
       }.get(key, '.list_info')
 
   ## make list container
@@ -73,7 +80,8 @@ class Daum:
       return {
           "blog": ".coll_cont",
           "news": ".coll_cont",
-          "tip": "#knowResultWrapper"
+          "tip": "#knowResultWrapper",
+          "cafe": '.scafe_fulltxt'
       }.get(key, '.mg_cont')
   
   ## make li select
@@ -95,6 +103,11 @@ class Daum:
   ## news url format
   def format_id_url(self, url):
     check_url = self.__news_id_reg.search(common.deleteHttp(url)).group()
+    return check_url
+
+  ## cafe url format
+  def format_cafe_url(self, url):
+    check_url = self.__basic_reg.search(common.deleteHttp(url)).group()
     return check_url
 
   def find_target_post(self):
@@ -133,9 +146,10 @@ class Daum:
             check_url = self.format_blog_url(link)
           elif self.__search_type == "news" or self.__search_type == "tip":
             check_url = self.format_id_url(link)
+          elif self.__search_type == "cafe":
+            check_url = self.format_cafe_url(link)
           else:
             check_url = common.deleteHttp(link)
-
           if check_url == self.__url:
             isBreak = True
             post_rank = (x * 10 + idx)
