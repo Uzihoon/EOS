@@ -13,8 +13,6 @@ class DaumPlace:
     self.__url = common.deleteHttp(url)
     self.__driver_url = "https://map.kakao.com/?from=total&q={0}&tab=place&nil_suggest=btn".format(self.__key)
 
-    ## regex
-
     ## element css selector
     self.__list_container = ".placelist"
     self.__li_select = ".PlaceItem"
