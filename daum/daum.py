@@ -4,6 +4,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import common
 import urllib.request
+import daum_log
 
 class Daum:
 
@@ -144,8 +145,11 @@ class Daum:
           check_url = str()
           if self.__search_type == 'blog':
             check_url = self.format_blog_url(link)
-          elif self.__search_type == "news" or self.__search_type == "tip":
+          elif self.__search_type == "news":
             check_url = self.format_id_url(link)
+          elif self.__search_type == "tip":
+            log = daum_log.DaumLog(link)
+            check_url = log.get_target_url()
           elif self.__search_type == "cafe":
             check_url = self.format_cafe_url(link)
           else:

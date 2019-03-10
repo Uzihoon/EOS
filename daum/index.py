@@ -40,7 +40,7 @@ import daum_shop
 ## TODO Tip Type일 경우 list에 있는 URL은 answer 기준 URL, question URL ID를 가져와야 함.
 
 ## get db info
-search_type = "shop"
+search_type = "tip"
 db_url = "https://place.map.kakao.com/1193848374"
 sort_type = "shophow"
 key = "쯔위"
