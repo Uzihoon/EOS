@@ -21,6 +21,9 @@ import daum
 # news: daum news url type (daum news 외 url(ex: 외부 사이트)의 경우 확인 불가)
 ##
 
+## TODO Video Type일 경우, youtube는 link 가져와서 sort 가능, kakao TV의 경우 request URL과 response URL이 달라서 구분이 불가능함.
+## TODO Tip Type일 경우 list에 있는 URL은 answer 기준 URL, question URL ID를 가져와야 함.
+
 ## get db info
 search_type = "tip"
 db_url = "https://tip.daum.net/question/86428255"
